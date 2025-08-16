@@ -2,140 +2,389 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Cyber Hacker Universe</title>
+  <title>CLASSIFIED - QUANTUM ACCESS TERMINAL</title>
   <style>
-    html, body {
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+    
+    * {
       margin: 0;
       padding: 0;
-      overflow: hidden;
-      height: 100%;
-      background: black;
-      font-family: monospace;
+      box-sizing: border-box;
     }
-
+    
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      color: #00ff41;
+      font-family: 'Orbitron', monospace;
+      cursor: crosshair;
+    }
+    
     canvas {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+    
+    #topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 30px;
+      background: linear-gradient(90deg, #001a00, #003300);
+      border-bottom: 2px solid #00ff41;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #00ff41;
+      margin-right: 10px;
+      animation: pulse 1.5s infinite;
+      box-shadow: 0 0 10px #00ff41;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.2); }
+    }
+    
+    #intro {
+      position: absolute;
+      top: 35%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #00ff41;
+      font-size: 16px;
+      text-align: left;
+      font-family: 'Orbitron', monospace;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 30px;
+      border: 2px solid #00ff41;
+      border-radius: 5px;
+      box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+      min-width: 600px;
+      backdrop-filter: blur(5px);
+    }
+    
+    .terminal-header {
+      color: #ff6b35;
+      font-size: 18px;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #ff6b35;
+    }
+    
+    .typing-line {
+      margin: 8px 0;
+      min-height: 20px;
+    }
+    
+    .cursor {
+      animation: blink 1s infinite;
+      background: #00ff41;
+      width: 8px;
+      height: 16px;
+      display: inline-block;
+    }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background: #001a00;
+      border: 1px solid #00ff41;
+      margin: 10px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #003300, #00ff41);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 1px 1px 2px #000;
+    }
+    
+    .warning {
+      color: #ff3333;
+      animation: warning-flash 0.8s infinite;
+    }
+    
+    @keyframes warning-flash {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .success {
+      color: #00ffff;
+      text-shadow: 0 0 5px #00ffff;
+    }
+    
+    #scanlines {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      display: block;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 65, 0.03) 2px,
+        rgba(0, 255, 65, 0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 3;
     }
-
-    /* Glitch Text */
+    
     .glitch {
+      animation: glitch 0.3s ease-in-out infinite;
+    }
+    
+    @keyframes glitch {
+      0% { transform: translate(0); }
+      20% { transform: translate(-1px, 1px); }
+      40% { transform: translate(-1px, -1px); }
+      60% { transform: translate(1px, 1px); }
+      80% { transform: translate(1px, -1px); }
+      100% { transform: translate(0); }
+    }
+    
+    .system-info {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 5em;
-      color: #0f0;
-      font-weight: bold;
-      text-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
-      animation: flicker 1.5s infinite;
-    }
-
-    @keyframes flicker {
-      0% { opacity: 1; }
-      50% { opacity: 0.6; text-shadow: 2px 2px 5px #0f0; }
-      100% { opacity: 1; }
-    }
-
-    /* Emoji Rain */
-    .emoji {
-      position: absolute;
-      top: -50px;
-      font-size: 24px;
-      color: #0f0;
-      animation: fall linear infinite;
-    }
-
-    @keyframes fall {
-      0% { transform: translateY(-50px); opacity: 1; }
-      100% { transform: translateY(100vh); opacity: 0; }
+      bottom: 20px;
+      right: 20px;
+      font-size: 10px;
+      color: #004400;
+      font-family: monospace;
     }
   </style>
 </head>
 <body>
-  <canvas id="space"></canvas>
   <canvas id="matrix"></canvas>
-  <div class="glitch">WELCOME</div>
+  <div id="overlay">
+    <div id="topbar">
+      <div class="status-indicator"></div>
+      <span>QUANTUM SECURE LINK ESTABLISHED</span>
+      <span style="margin-left: auto;">CLEARANCE: ULTRA</span>
+    </div>
+    <div id="scanlines"></div>
+    <div id="intro">
+      <div class="terminal-header">◢ CLASSIFIED SYSTEM ACCESS ◣</div>
+      <div id="terminal-content"></div>
+    </div>
+    <div class="system-info">
+      SYS_ID: QX-7749-ALPHA | LOC: [REDACTED] | UPTIME: 99.97%
+    </div>
+  </div>
 
   <script>
-    // Galaxy Stars
-    const space = document.getElementById('space');
-    const ctxSpace = space.getContext('2d');
-    space.width = window.innerWidth;
-    space.height = window.innerHeight;
-
-    let stars = [];
-    for (let i = 0; i < 200; i++) {
-      stars.push({
-        x: Math.random() * space.width,
-        y: Math.random() * space.height,
-        z: Math.random() * space.width
-      });
+    // Enhanced Matrix Animation
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
-
-    function drawStars() {
-      ctxSpace.fillStyle = "black";
-      ctxSpace.fillRect(0, 0, space.width, space.height);
-      ctxSpace.fillStyle = "white";
-      for (let star of stars) {
-        star.z -= 2;
-        if (star.z <= 0) star.z = space.width;
-        let k = 128.0 / star.z;
-        let px = star.x * k + space.width / 2;
-        let py = star.y * k + space.height / 2;
-        if (px >= 0 && px <= space.width && py >= 0 && py <= space.height) {
-          let size = (1 - star.z / space.width) * 3;
-          ctxSpace.fillRect(px, py, size, size);
-        }
-      }
-    }
-
-    setInterval(drawStars, 30);
-
-    // Matrix Code Rain
-    const matrix = document.getElementById('matrix');
-    const ctxMatrix = matrix.getContext('2d');
-    matrix.width = window.innerWidth;
-    matrix.height = window.innerHeight;
-
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()".split("");
-    const fontSize = 14;
-    const columns = matrix.width / fontSize;
-    const drops = Array.from({ length: columns }).map(() => 1);
-
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    const chars = "ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+-=[]{}|;:,.<>?";
+    const fontSize = 12;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = Array(columns).fill(0).map(() => Math.random() * -100);
+    
     function drawMatrix() {
-      ctxMatrix.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctxMatrix.fillRect(0, 0, matrix.width, matrix.height);
-      ctxMatrix.fillStyle = "#0f0";
-      ctxMatrix.font = fontSize + "px monospace";
-
+      ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.font = `${fontSize}px monospace`;
+      
       for (let i = 0; i < drops.length; i++) {
-        const text = letters[Math.floor(Math.random() * letters.length)];
-        ctxMatrix.fillText(text, i * fontSize, drops[i] * fontSize);
-        if (drops[i] * fontSize > matrix.height && Math.random() > 0.975) {
+        // Varying shades of green
+        const intensity = Math.random();
+        if (intensity > 0.95) {
+          ctx.fillStyle = "#ffffff"; // Bright white
+        } else if (intensity > 0.8) {
+          ctx.fillStyle = "#00ff41"; // Bright green
+        } else if (intensity > 0.5) {
+          ctx.fillStyle = "#008f11"; // Medium green
+        } else {
+          ctx.fillStyle = "#003300"; // Dark green
+        }
+        
+        const char = chars.charAt(Math.floor(Math.random() * chars.length));
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+        
+        ctx.fillText(char, x, y);
+        
+        if (y > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
         drops[i]++;
       }
     }
+    
     setInterval(drawMatrix, 50);
-
-    // Emoji Rain
-    const emojis = ["💀","👾","⚡","🔥","🛸","☠️","🤖","💻","🔒"];
-    function createEmoji() {
-      const emoji = document.createElement("div");
-      emoji.classList.add("emoji");
-      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      emoji.style.left = Math.random() * window.innerWidth + "px";
-      emoji.style.animationDuration = (Math.random() * 3 + 2) + "s";
-      document.body.appendChild(emoji);
-      setTimeout(() => emoji.remove(), 5000);
+    
+    // Professional Terminal Sequence
+    const terminal = document.getElementById('terminal-content');
+    const sequences = [
+      { text: "► INITIALIZING QUANTUM CRYPTOGRAPHIC PROTOCOLS...", delay: 100, class: "" },
+      { text: "► ESTABLISHING SECURE TUNNEL THROUGH 7 PROXIES...", delay: 80, class: "" },
+      { text: "► BYPASSING FIREWALL LAYERS [████████████] 100%", delay: 60, class: "", progress: true },
+      { text: "⚠ WARNING: INTRUSION DETECTION SYSTEM DETECTED", delay: 50, class: "warning" },
+      { text: "► DEPLOYING STEALTH COUNTERMEASURES...", delay: 70, class: "" },
+      { text: "► INJECTING PAYLOAD INTO TARGET SYSTEM...", delay: 90, class: "" },
+      { text: "► ACCESSING CLASSIFIED DATABASE...", delay: 80, class: "" },
+      { text: "► DECRYPTING FILES [██████████████] 100%", delay: 60, class: "", progress: true },
+      { text: "✓ ROOT ACCESS OBTAINED", delay: 100, class: "success" },
+      { text: "✓ PRIVILEGE ESCALATION: COMPLETE", delay: 80, class: "success" },
+      { text: "✓ BACKDOOR INSTALLED", delay: 70, class: "success" },
+      { text: "", delay: 500, class: "" },
+      { text: ">>> WELCOME TO DEEP SYSTEM ACCESS <<<", delay: 100, class: "success glitch" },
+      { text: ">>> ALL SECURITY PROTOCOLS COMPROMISED <<<", delay: 100, class: "success" },
+      { text: ">>> GHOST MODE: ACTIVATED <<<", delay: 100, class: "success" }
+    ];
+    
+    let currentSequence = 0;
+    let currentChar = 0;
+    
+    function typeSequence() {
+      if (currentSequence >= sequences.length) return;
+      
+      const seq = sequences[currentSequence];
+      const line = document.createElement('div');
+      line.className = `typing-line ${seq.class}`;
+      terminal.appendChild(line);
+      
+      if (seq.progress) {
+        // Create progress bar
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+        progressBar.innerHTML = `
+          <div class="progress-fill"></div>
+          <div class="progress-text">PROCESSING...</div>
+        `;
+        line.appendChild(progressBar);
+        
+        // Animate progress
+        setTimeout(() => {
+          progressBar.querySelector('.progress-fill').style.width = '100%';
+        }, 100);
+        
+        setTimeout(() => {
+          progressBar.querySelector('.progress-text').textContent = 'COMPLETE';
+          nextSequence();
+        }, 2000);
+      } else {
+        typeText(line, seq.text, seq.delay);
+      }
     }
-    setInterval(createEmoji, 300);
+    
+    function typeText(element, text, delay) {
+      let i = 0;
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      element.appendChild(cursor);
+      
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          element.insertBefore(document.createTextNode(text[i]), cursor);
+          i++;
+        } else {
+          cursor.remove();
+          clearInterval(interval);
+          setTimeout(nextSequence, 300);
+        }
+      }, delay);
+    }
+    
+    function nextSequence() {
+      currentSequence++;
+      setTimeout(typeSequence, Math.random() * 500 + 200);
+    }
+    
+    // Add some random glitch effects
+    setInterval(() => {
+      const lines = document.querySelectorAll('.typing-line');
+      if (lines.length > 0 && Math.random() > 0.95) {
+        const randomLine = lines[Math.floor(Math.random() * lines.length)];
+        randomLine.classList.add('glitch');
+        setTimeout(() => {
+          randomLine.classList.remove('glitch');
+        }, 300);
+      }
+    }, 1000);
+    
+    // Start the sequence
+    setTimeout(typeSequence, 1000);
+    
+    // Add mouse move effect
+    document.addEventListener('mousemove', (e) => {
+      if (Math.random() > 0.98) {
+        const spark = document.createElement('div');
+        spark.style.position = 'fixed';
+        spark.style.left = e.clientX + 'px';
+        spark.style.top = e.clientY + 'px';
+        spark.style.width = '2px';
+        spark.style.height = '2px';
+        spark.style.background = '#00ff41';
+        spark.style.boxShadow = '0 0 10px #00ff41';
+        spark.style.zIndex = '10';
+        spark.style.pointerEvents = 'none';
+        document.body.appendChild(spark);
+        
+        setTimeout(() => {
+          spark.remove();
+        }, 1000);
+      }
+    });
+    
+    // Favicon change
+    const favicon = document.createElement('link');
+    favicon.rel = 'icon';
+    favicon.href = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" fill="%23000"/><text x="8" y="12" text-anchor="middle" fill="%2300ff41" font-family="monospace" font-size="10">H</text></svg>';
+    document.head.appendChild(favicon);
   </script>
 </body>
 </html>
