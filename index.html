@@ -2,104 +2,140 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Hacker Matrix</title>
+  <title>Cyber Hacker Universe</title>
   <style>
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
       overflow: hidden;
+      height: 100%;
       background: black;
-      color: #00ff00;
       font-family: monospace;
     }
+
     canvas {
-      display: block;
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
     }
-    #intro {
+
+    /* Glitch Text */
+    .glitch {
       position: absolute;
-      top: 30%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      color: #00ff00;
-      font-size: 20px;
-      text-align: center;
-      white-space: pre-line;
-      animation: blink 1s infinite;
+      font-size: 5em;
+      color: #0f0;
+      font-weight: bold;
+      text-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
+      animation: flicker 1.5s infinite;
     }
-    @keyframes blink {
-      50% { opacity: 0; }
+
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; text-shadow: 2px 2px 5px #0f0; }
+      100% { opacity: 1; }
+    }
+
+    /* Emoji Rain */
+    .emoji {
+      position: absolute;
+      top: -50px;
+      font-size: 24px;
+      color: #0f0;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-50px); opacity: 1; }
+      100% { transform: translateY(100vh); opacity: 0; }
     }
   </style>
 </head>
 <body>
+  <canvas id="space"></canvas>
   <canvas id="matrix"></canvas>
-  <div id="intro"></div>
+  <div class="glitch">WELCOME</div>
 
   <script>
-    // MATRIX ANIMATION
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
+    // Galaxy Stars
+    const space = document.getElementById('space');
+    const ctxSpace = space.getContext('2d');
+    space.width = window.innerWidth;
+    space.height = window.innerHeight;
 
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
+    let stars = [];
+    for (let i = 0; i < 200; i++) {
+      stars.push({
+        x: Math.random() * space.width,
+        y: Math.random() * space.height,
+        z: Math.random() * space.width
+      });
+    }
 
-    const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
+    function drawStars() {
+      ctxSpace.fillStyle = "black";
+      ctxSpace.fillRect(0, 0, space.width, space.height);
+      ctxSpace.fillStyle = "white";
+      for (let star of stars) {
+        star.z -= 2;
+        if (star.z <= 0) star.z = space.width;
+        let k = 128.0 / star.z;
+        let px = star.x * k + space.width / 2;
+        let py = star.y * k + space.height / 2;
+        if (px >= 0 && px <= space.width && py >= 0 && py <= space.height) {
+          let size = (1 - star.z / space.width) * 3;
+          ctxSpace.fillRect(px, py, size, size);
+        }
+      }
+    }
+
+    setInterval(drawStars, 30);
+
+    // Matrix Code Rain
+    const matrix = document.getElementById('matrix');
+    const ctxMatrix = matrix.getContext('2d');
+    matrix.width = window.innerWidth;
+    matrix.height = window.innerHeight;
+
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()".split("");
     const fontSize = 14;
-    const columns = canvas.width / fontSize;
+    const columns = matrix.width / fontSize;
+    const drops = Array.from({ length: columns }).map(() => 1);
 
-    const drops = [];
-    for (let x = 0; x < columns; x++) drops[x] = 1;
-
-    function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = "#0F0";
-      ctx.font = fontSize + "px monospace";
+    function drawMatrix() {
+      ctxMatrix.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctxMatrix.fillRect(0, 0, matrix.width, matrix.height);
+      ctxMatrix.fillStyle = "#0f0";
+      ctxMatrix.font = fontSize + "px monospace";
 
       for (let i = 0; i < drops.length; i++) {
-        const text = letters.charAt(Math.floor(Math.random() * letters.length));
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctxMatrix.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > matrix.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
         drops[i]++;
       }
     }
+    setInterval(drawMatrix, 50);
 
-    setInterval(draw, 33);
-
-    // INTRO TYPING
-    const intro = document.getElementById('intro');
-    const text = [
-      "ACCESS GRANTED...",
-      "Initializing system...",
-      "Loading modules...",
-      "Injecting payload...",
-      ">>> Welcome to Hacker Mode <<<"
-    ];
-
-    let line = 0;
-    let index = 0;
-
-    function type() {
-      if (line < text.length) {
-        if (index < text[line].length) {
-          intro.textContent += text[line][index];
-          index++;
-          setTimeout(type, 50);
-        } else {
-          intro.textContent += "\n";
-          line++;
-          index = 0;
-          setTimeout(type, 500);
-        }
-      }
+    // Emoji Rain
+    const emojis = ["💀","👾","⚡","🔥","🛸","☠️","🤖","💻","🔒"];
+    function createEmoji() {
+      const emoji = document.createElement("div");
+      emoji.classList.add("emoji");
+      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      emoji.style.left = Math.random() * window.innerWidth + "px";
+      emoji.style.animationDuration = (Math.random() * 3 + 2) + "s";
+      document.body.appendChild(emoji);
+      setTimeout(() => emoji.remove(), 5000);
     }
-    type();
+    setInterval(createEmoji, 300);
   </script>
 </body>
 </html>
