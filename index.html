@@ -1,70 +1,105 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>0xNtah | Hacker Terminal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Hacker Matrix</title>
   <style>
     body {
-      background-color: #000;
-      color: #0f0;
+      margin: 0;
+      overflow: hidden;
+      background: black;
+      color: #00ff00;
       font-family: monospace;
-      padding: 20px;
-      font-size: 18px;
     }
-    #terminal {
-      max-width: 900px;
-      margin: auto;
+    canvas {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+    #intro {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #00ff00;
+      font-size: 20px;
+      text-align: center;
       white-space: pre-line;
-    }
-    .cursor {
-      display: inline-block;
-      width: 10px;
-      background: #0f0;
-      animation: blink 0.8s infinite;
+      animation: blink 1s infinite;
     }
     @keyframes blink {
-      50% { background: transparent; }
+      50% { opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <div id="terminal"></div>
+  <canvas id="matrix"></canvas>
+  <div id="intro"></div>
+
   <script>
-    const lines = [
-      "Initializing system...",
-      "Loading modules [██████████] 100%",
-      "Connecting to secure server...",
-      "Access Granted ✔",
-      "Welcome, 0xNtah",
-      "Launching GitHub Pages terminal..."
-    ];
+    // MATRIX ANIMATION
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
 
-    const terminal = document.getElementById("terminal");
-    let line = 0;
-    let char = 0;
-    let typingSpeed = 50;
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
 
-    function typeLine() {
-      if (line < lines.length) {
-        if (char < lines[line].length) {
-          terminal.innerHTML += lines[line][char];
-          char++;
-          setTimeout(typeLine, typingSpeed);
-        } else {
-          terminal.innerHTML += "\n";
-          line++;
-          char = 0;
-          setTimeout(typeLine, 500);
+    const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+
+    const drops = [];
+    for (let x = 0; x < columns; x++) drops[x] = 1;
+
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#0F0";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
         }
-      } else {
-        terminal.innerHTML += "\n> Website successfully deployed at: https://0xNtah.github.io\n";
-        terminal.innerHTML += "> Happy hacking...\n";
+        drops[i]++;
       }
     }
 
-    terminal.innerHTML = "> Booting up...\n";
-    setTimeout(typeLine, 1000);
+    setInterval(draw, 33);
+
+    // INTRO TYPING
+    const intro = document.getElementById('intro');
+    const text = [
+      "ACCESS GRANTED...",
+      "Initializing system...",
+      "Loading modules...",
+      "Injecting payload...",
+      ">>> Welcome to Hacker Mode <<<"
+    ];
+
+    let line = 0;
+    let index = 0;
+
+    function type() {
+      if (line < text.length) {
+        if (index < text[line].length) {
+          intro.textContent += text[line][index];
+          index++;
+          setTimeout(type, 50);
+        } else {
+          intro.textContent += "\n";
+          line++;
+          index = 0;
+          setTimeout(type, 500);
+        }
+      }
+    }
+    type();
   </script>
 </body>
 </html>
