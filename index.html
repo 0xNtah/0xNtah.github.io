@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>0xNtah | Hacker Terminal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background-color: #000;
+      color: #0f0;
+      font-family: monospace;
+      padding: 20px;
+      font-size: 18px;
+    }
+    #terminal {
+      max-width: 900px;
+      margin: auto;
+      white-space: pre-line;
+    }
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      background: #0f0;
+      animation: blink 0.8s infinite;
+    }
+    @keyframes blink {
+      50% { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="terminal"></div>
+  <script>
+    const lines = [
+      "Initializing system...",
+      "Loading modules [██████████] 100%",
+      "Connecting to secure server...",
+      "Access Granted ✔",
+      "Welcome, 0xNtah",
+      "Launching GitHub Pages terminal..."
+    ];
+
+    const terminal = document.getElementById("terminal");
+    let line = 0;
+    let char = 0;
+    let typingSpeed = 50;
+
+    function typeLine() {
+      if (line < lines.length) {
+        if (char < lines[line].length) {
+          terminal.innerHTML += lines[line][char];
+          char++;
+          setTimeout(typeLine, typingSpeed);
+        } else {
+          terminal.innerHTML += "\n";
+          line++;
+          char = 0;
+          setTimeout(typeLine, 500);
+        }
+      } else {
+        terminal.innerHTML += "\n> Website successfully deployed at: https://0xNtah.github.io\n";
+        terminal.innerHTML += "> Happy hacking...\n";
+      }
+    }
+
+    terminal.innerHTML = "> Booting up...\n";
+    setTimeout(typeLine, 1000);
+  </script>
+</body>
+</html>
